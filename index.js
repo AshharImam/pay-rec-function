@@ -6,13 +6,14 @@ const axios = require("axios");
 
 // require("dotenv").config();
 const app = express();
-const port = process.env.port || 5101;
+// const port = process.env.port || 5101;
 const expo = new Expo();
 
 app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
+  console.log("requested");
   const result = reqTallyServer();
   // res.status(404).send();
   result
@@ -299,5 +300,5 @@ const addToDb = async (
 };
 
 app.listen(process.env.port, () =>
-  console.log(`Server is running in port: ${port}`)
+  console.log(`Server is running in port: ${process.env.port}`)
 );
