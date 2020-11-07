@@ -298,4 +298,6 @@ const addToDb = async (
   console.log(res.id);
 };
 
-app.listen(port, () => console.log(`Server is running in port: ${port}`));
+app.listen(process.env.port, () =>
+  console.log(`Server is running in port: ${port}`)
+);
