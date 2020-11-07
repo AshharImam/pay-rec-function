@@ -82,8 +82,7 @@ const getName = async (
     date,
     chequeNumber
   );
-  addToDb(name, amount, ledgerName, vchNumber, checked, date, chequeNumber);
-  sendNotification(name, amount, ledgerName, vchNumber, checked, chequeNumber);
+
   console.log("Status se pehle");
 };
 
@@ -218,7 +217,18 @@ const generateRecieptinTally = async (
       "Content-Type": "text/xml",
     },
   })
-    .then((res) => console.log(res))
+    .then((res) => {
+      addToDb(name, amount, ledgerName, vchNumber, checked, date, chequeNumber);
+      sendNotification(
+        name,
+        amount,
+        ledgerName,
+        vchNumber,
+        checked,
+        chequeNumber
+      );
+      console.log(res);
+    })
     .catch((e) => console.log(e));
 };
 
