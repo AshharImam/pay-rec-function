@@ -1,12 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const db = require("./firebase");
+const firebase = require("firebase");
 const { Expo } = require("expo-server-sdk");
 const axios = require("axios");
 
 // require("dotenv").config();
 const app = express();
-// const port = process.env.port || 5101;
+const port = process.env.port || 5005;
 const expo = new Expo();
 
 app.use(cors());
@@ -55,6 +56,7 @@ app.post("/post", (req, res) => {
     [, , , , , , chequeNumberJSON] = req.query["_parts"];
     [, chequeNumber] = JSON.parse(chequeNumberJSON);
   }
+  console.log(uid, amount, ledgerName, vchNumber, checked, date, chequeNumber);
   getName(uid, amount, ledgerName, vchNumber, checked, date, chequeNumber);
   console.log("Status");
   res.json({
@@ -71,11 +73,8 @@ const getName = async (
   date,
   chequeNumber
 ) => {
-  const user = await db.collection("users").doc(uid).get();
-
-  const name = user.data().firstName;
   generateRecieptinTally(
-    name,
+    uid,
     amount,
     ledgerName,
     vchNumber,
@@ -245,15 +244,16 @@ const sendNotification = async (
   const users = db.collection("users");
   await users.get().then(({ docs }) => {
     docs.forEach((doc) => {
+      console.log(doc.data().token);
       messages.push({
-        to: doc.data().token[0].data,
+        to: doc.data().token,
         sound: "default",
         body: `A payment received by ${name} through ${checked} of ${amount} of ${ledgerName} against Voucher ${vchNumber}`,
         android: {
           channelId: "myChannelId",
         },
       });
-      console.log(doc.data().token[0].data);
+      console.log(doc.data().token);
     });
   });
   let chunks = expo.chunkPushNotifications(messages);
@@ -293,12 +293,10 @@ const addToDb = async (
     ledgerName: ledgerName,
     vchNumber: vchNumber,
     checked: checked,
-    date: date,
     chequeNumber: chequeNumber,
+    created: firebase.firestore.Timestamp.now(),
   });
   console.log(res.id);
 };
 
-app.listen(process.env.port, () =>
-  console.log(`Server is running in port: ${process.env.port}`)
-);
+app.listen(port, () => console.log(`Server is running in port: ${port}`));
